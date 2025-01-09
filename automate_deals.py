@@ -7,27 +7,29 @@ def merge_deals(amazon_deals, flipkart_deals):
     # Merge both lists (you can customize this logic based on your need)
     all_deals = []
     
+    # Merge Amazon deals
     for deal in amazon_deals:
         all_deals.append({
             "platform": "Amazon",
-            "title": deal.get('title', ''),
-            "price": deal.get('price', ''),
-            "link": deal.get('link', '')
+            "title": deal.get('title', 'No title'),
+            "price": deal.get('price', 'Price not available'),
+            "link": deal.get('link', '#')
         })
     
+    # Merge Flipkart deals
     for deal in flipkart_deals:
         all_deals.append({
             "platform": "Flipkart",
-            "title": deal.get('title', ''),
-            "price": deal.get('price', ''),
-            "link": deal.get('link', '')
+            "title": deal.get('title', 'No title'),
+            "price": deal.get('price', 'Price not available'),
+            "link": deal.get('link', '#')
         })
     
     return all_deals
 
 def send_deals_to_telegram(deals):
     for deal in deals:
-        message = f"{deal['platform']} Deal: {deal['title']}\nPrice: {deal['price']}\nLink: {deal['link']}"
+        message = f"{deal['platform']} Deal:\n{deal['title']}\nPrice: {deal['price']}\nLink: {deal['link']}"
         send_to_telegram(message)
 
 def main():
