@@ -19,3 +19,4 @@ def get_flipkart_deals():
     else:
         print("Error fetching Flipkart deals")
         return []
+
