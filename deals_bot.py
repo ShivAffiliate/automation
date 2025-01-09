@@ -25,15 +25,15 @@ def get_amazon_deals():
     try:
         # Fetch product details
         products = amazon.get_items(item_ids)
-        deals = [
-            {
+        deals = []
+        for product in products:
+            deal = {
                 'platform': 'Amazon',
-                'title': product.get('ItemInfo.Title.DisplayValue', 'No Title'),
-                'price': product.get('Offers.Listings[0].Price.DisplayAmount', 'Price Not Available'),
+                'title': product.get('ItemInfo', {}).get('Title', {}).get('DisplayValue', 'No Title'),
+                'price': product.get('Offers', {}).get('Listings', [{}])[0].get('Price', {}).get('DisplayAmount', 'Price Not Available'),
                 'link': product.get('DetailPageURL', '#')
             }
-            for product in products
-        ]
+            deals.append(deal)
         return deals
     except Exception as e:
         print(f"Error fetching Amazon deals: {e}")
@@ -55,15 +55,15 @@ def get_flipkart_deals():
         response = requests.get(flipkart_url, headers=headers)
         if response.status_code == 200:
             offers = response.json().get('offers', [])
-            deals = [
-                {
+            deals = []
+            for offer in offers:
+                deal = {
                     'platform': 'Flipkart',
                     'title': offer.get('title', 'No Title'),
                     'price': offer.get('price', 'Price Not Available'),
                     'link': offer.get('url', '#')
                 }
-                for offer in offers
-            ]
+                deals.append(deal)
             return deals
         else:
             print(f"Error fetching Flipkart deals: {response.status_code}")
