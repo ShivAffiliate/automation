@@ -10,13 +10,16 @@ def get_amazon_deals():
     ACCESS_KEY = os.getenv('AMAZON_ACCESS_KEY')
     SECRET_KEY = os.getenv('AMAZON_SECRET_KEY')
     ASSOCIATE_TAG = os.getenv('AMAZON_ASSOCIATE_TAG')
+    
+    # Set your country code to 'IN' for India
+    COUNTRY = os.getenv('AMAZON_COUNTRY', 'IN')  # Default to 'IN' (India) if not set
 
     if not (ACCESS_KEY and SECRET_KEY and ASSOCIATE_TAG):
         print("Amazon API credentials are not set. Please configure environment variables.")
         return []
 
-    # Initialize Amazon API client
-    amazon = AmazonApi(ACCESS_KEY, SECRET_KEY, ASSOCIATE_TAG)
+    # Initialize Amazon API client with 'IN' country code for India
+    amazon = AmazonApi(ACCESS_KEY, SECRET_KEY, ASSOCIATE_TAG, COUNTRY)
     item_ids = ['B07PGL2ZSL']  # Replace with actual ASINs
 
     try:
@@ -104,12 +107,14 @@ def main():
         amazon_deals = get_amazon_deals()
         flipkart_deals = get_flipkart_deals()
 
-        # Merge and send deals to Telegram
+        # Merge the deals from both platforms
         all_deals = amazon_deals + flipkart_deals
+
+        # Send the merged deals to Telegram
         send_deals_to_telegram(bot, telegram_chat_id, all_deals)
 
         # Wait for 1 hour before fetching deals again
-        time.sleep(3600)
+        time.sleep(3600)  # 3600 seconds = 1 hour
 
 
 if __name__ == "__main__":
