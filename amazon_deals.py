@@ -1,5 +1,5 @@
 import requests
-from amazon_paapi import AmazonAPI
+from amazon_paapi import AmazonApi
 
 def get_amazon_deals():
     # Define your Amazon API credentials
