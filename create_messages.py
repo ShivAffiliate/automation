@@ -1,60 +1,50 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import random
 
-# This function allows us to create an HTML message to send
-# You can edit all fields of the message using HTML syntax
-
 def create_item_html(items):
     response = []
     print(f'{5 * "*"} Creating post {5 * "*"}')
 
-    # Shuffling items
+    # Shuffle items to randomize order
     random.shuffle(items)
 
-    # Iterate over items
+    # Iterate over items to build the message
     for item in items:
-        # Skip if item is None
-        if item is None:
-            continue
-        
-        # Check if required keys are present in item
-        if 'title' not in item or 'url' not in item or 'image' not in item or 'price' not in item:
-            print(f"Skipping item with missing required fields: {item}")
-            continue  # Skip items with missing required data
-        
-        # Creating buy button
-        keyboard = [
-            [InlineKeyboardButton("🛒 Buy Now 🛒", callback_data='buy', url=item.get("url"))],
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
+        if 'off' in item:
+            # Create a buy button
+            keyboard = [
+                [InlineKeyboardButton("🛍️ Buy Now 🛒", callback_data='buy', url=item["url"])],
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
 
-        # Creating message body
-        html = ""
-        html += f"🎁 <b>{item['title']}</b> 🎁\n\n"
+            # Create message body
+            html = ""
 
-        # Check if description exists and add it
-        if 'description' in item:
-            html += f"{item['description']}\n"
+            # Show the product image as a clickable link
+            if 'image' in item:
+                html += f"📷 <a href='{item['image']}'>Click to view the image</a>\n\n"
 
-        # Add image (invisible link to avoid break in layout)
-        html += f"<a href='{item['image']}'>&#8205;</a>\n"
+            # Add the title
+            html += f"🎉 <b>{item['title']}</b> 🎉\n\n"
 
-        # Check if 'savings' exists and add original price if available
-        if 'savings' in item and 'original_price' in item:
-            html += f"❌ Was: ₹{item['original_price']} ❌\n\n"
+            # Add description if available
+            if 'description' in item:
+                html += f"📜 <i>{item['description']}</i>\n\n"
 
-        # Add current price
-        html += f"💰 <b>Now at: {item['price']}</b> 💰\n\n"
+            # Display the original price if available
+            if 'original_price' in item:
+                html += f"❌ <i>Was: ₹{item['original_price']}</i>\n"
 
-        # Add savings if present
-        if 'savings' in item:
-            html += f"✅ <b>You Save: ₹{item['savings']}</b> ✅\n\n"
+            # Display the current price
+            html += f"💰 <b>Now: {item['price']}</b>\n\n"
 
-        # Link for more details
-        html += f"<b><a href='{item['url']}'>Click here for more details</a></b>"
+            # Show savings if available
+            if 'savings' in item:
+                html += f"🔥 <b>You Save: ₹{item['savings']}!</b> 🔥\n\n"
 
-        # Append HTML and reply markup to the response
-        response.append(html)
-        response.append(reply_markup)
+
+            # Append the message and reply markup to the response
+            response.append(html)
+            response.append(reply_markup)
 
     return response
