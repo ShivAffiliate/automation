@@ -1,4 +1,3 @@
-# This function parses amazon response
 def parse_response(response):
     items = response.search_result.items
     res_items = []
