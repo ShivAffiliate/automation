@@ -3,8 +3,8 @@ TOKEN = "7928675863:AAHF-5tTGWdJ-yw8MdWzgs_sJnyWSDwAApw"
 CHANNEL_NAME = "@testchannel09012025"
 
 # ***** BOT ACTIVITY TIME *****
-MIN_HOUR = 9
-MAX_HOUR = 24
+MIN_HOUR = 1
+MAX_HOUR = 5
 PAUSE_MINUTES = 2
 
 # ***** Amazon API Keys and parameters *****
