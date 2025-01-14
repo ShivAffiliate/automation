@@ -20,9 +20,10 @@ IST = pytz.timezone('Asia/Kolkata')
 def is_active() -> bool:
     now_utc = datetime.now(pytz.utc)
     now_ist = now_utc.astimezone(IST)
-    
+
+    cuurent_hour = now_ist.hour
     now = datetime.now().time()
-    return MIN_HOUR < now_ist < MAX_HOUR
+    return MIN_HOUR <= cuurent_hour < MAX_HOUR
 
 def send_message(item_data: List[str]) -> List[str]:
     """Send a single message to the Telegram channel."""
