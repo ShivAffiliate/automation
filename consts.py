@@ -3,8 +3,8 @@ TOKEN = "7928675863:AAHF-5tTGWdJ-yw8MdWzgs_sJnyWSDwAApw"
 CHANNEL_NAME = "@megalootsjunction"
 
 # ***** BOT ACTIVITY TIME *****
-MIN_HOUR = 1
-MAX_HOUR = 4
+MIN_HOUR = 9
+MAX_HOUR = 24
 PAUSE_MINUTES = 2
 
 # ***** Amazon API Keys and parameters *****
