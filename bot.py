@@ -12,10 +12,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-# ********** Author: Samir Salman **********
 
-
-# Search keywords definition
 """
 A dictionary with {CATEGORY_NAME: [<LIST OF THE CATEGORY KEYWORDS>]}
 """
