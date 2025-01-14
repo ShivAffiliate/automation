@@ -4,6 +4,7 @@ from amazon_api import search_items
 from create_messages import create_item_html
 import time
 from datetime import datetime
+import pytz
 import random
 from consts import *
 import logging
@@ -14,10 +15,14 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 # Define search keywords (could be dynamic or static)
 keywords = ["Electronics", "Fashion", "Books", "Home Appliances", "Toys", "Beauty"]
+IST = pytz.timezone('Asia/Kolkata')
 
 def is_active() -> bool:
+    now_utc = datetime.now(pytz.utc)
+    now_ist = now_utc.astimezone(IST)
+    
     now = datetime.now().time()
-    return MIN_HOUR < now.hour < MAX_HOUR
+    return MIN_HOUR < now_ist < MAX_HOUR
 
 def send_message(item_data: List[str]) -> List[str]:
     """Send a single message to the Telegram channel."""
