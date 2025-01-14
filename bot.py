@@ -22,7 +22,7 @@ A dictionary with {CATEGORY_NAME: [<LIST OF THE CATEGORY KEYWORDS>]}
 
 categories = {
     "Electronics": [
-        "Televisori",
+        "Television",
     ]
 }
 
