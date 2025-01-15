@@ -11,49 +11,32 @@ import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# ********** Author: Samir Salman **********
+
 
 # Define search keywords (could be dynamic or static)
 keywords = ["Electronics", "Fashion", "Books", "Home Appliances", "Toys", "Beauty"]
-
-# Mapping keywords to respective channel IDs
-category_channel_mapping = {
-    "Electronics": "@electronics_channel",
-    "Fashion": "@fashion_channel",
-    "Books": "@books_channel",
-    "Home Appliances": "@home_appliances_channel",
-    "Toys": "@toys_channel",
-    "Beauty": "@beauty_channel"
-}
-
 IST = pytz.timezone('Asia/Kolkata')
 
 def is_active() -> bool:
-    """Check if the bot should be active based on current time."""
     now_utc = datetime.now(pytz.utc)
     now_ist = now_utc.astimezone(IST)
 
-    current_hour = now_ist.hour
-    return MIN_HOUR <= current_hour < MAX_HOUR
+    cuurent_hour = now_ist.hour
+    now = datetime.now().time()
+    return MIN_HOUR <= cuurent_hour < MAX_HOUR
 
-def send_message(bot: telegram.Bot, category: str, item_data: List[str]) -> List[str]:
-    """Send a single message to the appropriate Telegram channel based on category."""
+def send_message(item_data: List[str]) -> List[str]:
+    """Send a single message to the Telegram channel."""
     try:
-        # Get the channel for the category
-        channel = category_channel_mapping.get(category)
-        if channel:
-            bot.send_message(
-                chat_id=channel,
-                text=item_data[0],
-                reply_markup=item_data[1],
-                parse_mode=telegram.ParseMode.HTML,
-            )
-            logging.info(f"Message sent successfully to {channel}.")
-        else:
-            logging.warning(f"No channel mapped for category: {category}")
+        bot.send_message(
+            chat_id=CHANNEL_NAME,
+            text=item_data[0],
+            reply_markup=item_data[1],
+            parse_mode=telegram.ParseMode.HTML,
+        )
+        logging.info("Message sent successfully.")
     except Exception as e:
-        logging.error(f"Error sending message to {category} channel: {e}")
-    
+        logging.error(f"Error sending message: {e}")
     return item_data[2:]  # Return the remaining items in the list
 
 def run_bot(bot: telegram.Bot, keywords: List[str]) -> None:
@@ -99,14 +82,12 @@ def run_bot(bot: telegram.Bot, keywords: List[str]) -> None:
             while prepared_messages:
                 if is_active():
                     try:
-                        logging.info(f"Sending post to channels...")
-                        current_item_data = prepared_messages.pop(0)  # Get the first item for sending
-                        category = current_item_data[2]  # Assuming the 3rd element contains the category
-                        prepared_messages = send_message(bot, category, current_item_data)
+                        logging.info(f"Sending post to channel...")
+                        prepared_messages = send_message(prepared_messages)
                         time.sleep(60)  # Wait 1 minute before sending the next deal
                     except Exception as e:
                         logging.error(f"Error sending message: {e}")
-                        continue
+                        prepared_messages = prepared_messages[2:]  # Skip the problematic message
                 else:
                     logging.info(f"Bot inactive during off hours.")
                     time.sleep(300)  # Wait 5 minutes before checking again
