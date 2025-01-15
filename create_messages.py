@@ -29,7 +29,10 @@ def create_item_html(items):
 
             # Add description if available
             if 'description' in item:
-                html += f"📜 <i>{item['description']}</i>\n\n"
+                max_length = 200  # Adjust to your preferred maximum length
+                truncated_description = (item['description'][:max_length] + '...') if len(item['description']) > max_length else item['description']
+                html += f"📜 <i>{truncated_description}</i>\n\n"
+
 
             # Display the original price if available
             if 'original_price' in item:
