@@ -17,6 +17,20 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 keywords = ["Electronics", "Fashion", "Books", "Home Appliances", "Toys", "Beauty"]
 IST = pytz.timezone('Asia/Kolkata')
 
+def send_message(item_data: List[str]) -> List[str]:
+    """Send a single message to the Telegram channel."""
+    try:
+        bot.send_message(
+            chat_id=CHANNEL_NAME,
+            text=item_data[0],
+            reply_markup=item_data[1],
+            parse_mode=telegram.ParseMode.HTML,
+        )
+        logging.info("Message sent successfully.")
+    except Exception as e:
+        logging.error(f"Error sending message: {e}")
+    return item_data[2:]
+
 def is_active() -> bool:
     now_utc = datetime.now(pytz.utc)
     now_ist = now_utc.astimezone(IST)
