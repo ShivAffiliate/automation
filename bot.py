@@ -25,20 +25,6 @@ def is_active() -> bool:
     now = datetime.now().time()
     return MIN_HOUR <= cuurent_hour < MAX_HOUR
 
-def send_message(item_data: List[str]) -> List[str]:
-    """Send a single message to the Telegram channel."""
-    try:
-        bot.send_message(
-            chat_id=CHANNEL_NAME,
-            text=item_data[0],
-            reply_markup=item_data[1],
-            parse_mode=telegram.ParseMode.HTML,
-        )
-        logging.info("Message sent successfully.")
-    except Exception as e:
-        logging.error(f"Error sending message: {e}")
-    return item_data[2:]  # Return the remaining items in the list
-
 def run_bot(bot: telegram.Bot, keywords: List[str]) -> None:
     """Run the bot to fetch and send deals."""
     while True:
