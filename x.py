@@ -10,6 +10,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from amazon_api import search_items  # Assuming this is a valid import for fetching Amazon deals.
 
@@ -24,9 +25,15 @@ TELEGRAM_CHANNEL_LINK = "https://t.me/megalootsjunction"
 X_USERNAME = "shivkumaraffiliate@gmail.com"
 X_PASSWORD = "Secure#2510"
 
-# Selenium WebDriver setup
+# Set up headless Chrome options
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # Ensure the browser runs in headless mode
+chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration (optional)
+chrome_options.add_argument("--no-sandbox")  # Avoid issues when running in Docker (optional)
+
+# Selenium WebDriver setup with headless configuration
 service = Service(ChromeDriverManager().install())
-driver = webdriver.Chrome(service=service)
+driver = webdriver.Chrome(service=service, options=chrome_options)
 
 # Predefined list of hashtags for SEO
 HASHTAGS = [
