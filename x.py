@@ -12,7 +12,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
-from amazon_api import search_items  # Assuming this is a valid import for fetching Amazon deals.
+import json
+from amazon_api import search_items  
+
+
+from amazon_api import search_items
 
 # Constants
 IST = pytz.timezone("Asia/Kolkata")
@@ -20,18 +24,19 @@ MAX_DEALS = 24
 DAYS_TO_KEEP_FILES = 5
 DEALS_FOLDER = "deals_csv"
 TELEGRAM_CHANNEL_LINK = "https://t.me/megalootsjunction"
+COOKIE_FILE_NAME = "cookies.json"
 
 # X.com login details (replace with your credentials)
 X_USERNAME = "shivkumaraffiliate@gmail.com"
 X_PASSWORD = "Secure#2510"
 
-# Set up headless Chrome options
+# Set up Chrome options (headless removed)
 chrome_options = Options()
-chrome_options.add_argument("--headless")  # Ensure the browser runs in headless mode
+# chrome_options.add_argument("--headless")  # Removed headless mode
 chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration (optional)
 chrome_options.add_argument("--no-sandbox")  # Avoid issues when running in Docker (optional)
 
-# Selenium WebDriver setup with headless configuration
+# Selenium WebDriver setup with regular browser configuration
 service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
@@ -56,6 +61,8 @@ def create_csv_file(deals):
     with open(filename, mode="w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
         writer.writerow(["Title", "Price", "Original Price", "Savings", "Image URL", "Affiliate URL"])
+
+
         for deal in deals:
             writer.writerow([deal.get("title", "N/A"),
                              deal.get("price", "N/A"),
@@ -89,31 +96,41 @@ def randomize_hashtags():
     num_hashtags = random.randint(1, 4)  # Randomly select between 1 to 4 hashtags
     return random.sample(HASHTAGS, num_hashtags)  # Select random hashtags
 
+def load_cookies():
+    """Load cookies from the saved file."""
+    if os.path.exists(COOKIE_FILE_NAME):
+        with open(COOKIE_FILE_NAME, "r") as file:
+            cookies = json.load(file)
+            for cookie in cookies:
+                driver.add_cookie({
+                    'name': cookie['name'],
+                    'value': cookie['value'],
+                    'domain': cookie['domain'],
+                    'path': cookie['path'],
+                    'expiry': cookie['expiry'],
+                    'httpOnly': cookie['httpOnly'],
+                    'secure': cookie['secure'],
+                    'sameSite': cookie['sameSite']
+                })
+        print("✅ Cookies loaded successfully!")
+    else:
+        print("⚠️ No cookies found, you must log in manually once.")
+
+def save_cookies():
+    """Save the cookies to a file."""
+    cookies = driver.get_cookies()
+    with open(COOKIE_FILE_NAME, "w") as file:
+        json.dump(cookies, file)
+    print("✅ Cookies saved successfully!")
+
 def send_to_x_com(driver, deals_csv):
     """Send deals to X (Twitter) using Selenium."""
-    # Log in to X.com (formerly Twitter)
-    driver.get("https://x.com/login")
-    time.sleep(5)
-    
-    # Enter credentials
-    driver.find_element(By.NAME, "text").send_keys(X_USERNAME)  # Email/Username field
-    driver.find_element(By.XPATH, "//span[text()='Next']").click()  # Click Next
-    time.sleep(2)
+    # Load cookies
+    driver.get("https://x.com")
+    load_cookies()
+    driver.refresh()
+    time.sleep(5)  # Let the page load after cookies are added
 
-    # Wait and enter username if prompted
-    username_field = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, "//input[@name='text']"))
-    )
-    username_field.send_keys("megadealsjunc")  # Replace with actual username/email
-    username_field.send_keys(Keys.ENTER)
-
-    # Enter password
-    password_field = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.NAME, "password"))
-    )
-    password_field.send_keys(X_PASSWORD + Keys.RETURN)
-    time.sleep(5)
-    
     # Read deals from CSV
     with open(deals_csv, mode="r", encoding="utf-8") as file:
         reader = csv.DictReader(file)
@@ -172,7 +189,7 @@ if __name__ == "__main__":
         csv_file = create_csv_file(deals)
         print(f"Deals saved to {csv_file}")
 
-        # Step 2: Send deals to X.com (Twitter)
+        # Step 2: Send deals to X.com (Twitter) using cookies for login
         send_to_x_com(driver, csv_file)
 
         # Step 3: Delete old CSV files
@@ -181,4 +198,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
-        driver.quit()
+        driver.quit()  # Close the browser
